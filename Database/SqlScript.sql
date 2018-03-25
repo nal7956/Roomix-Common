@@ -274,6 +274,7 @@ CREATE TABLE InvoicePosition (
 );
 
 -- Constrain Checks
+DELIMITER //
 CREATE TRIGGER InvoicePositionInsertConstrain BEFORE INSERT On InvoicePosition
 	FOR EACH ROW
 	BEGIN
@@ -290,6 +291,7 @@ CREATE TRIGGER InvoicePositionInsertConstrain BEFORE INSERT On InvoicePosition
         SET MESSAGE_TEXT = 'Multiple specifications in the Invoice Position';
     END IF;
 	END;
+	//
 CREATE TRIGGER InvoicePositionUpdateConstrain BEFORE UPDATE On InvoicePosition
 	FOR EACH ROW
 	BEGIN
@@ -310,6 +312,7 @@ CREATE TRIGGER InvoicePositionUpdateConstrain BEFORE UPDATE On InvoicePosition
         SET MESSAGE_TEXT = 'Invoice already make. Changes are not Allowed';
 		END IF;
 	END;
+	//
 CREATE TRIGGER ContactInserConstrain BEFORE INSERT On Contact
 	FOR EACH ROW
 	BEGIN
@@ -320,6 +323,7 @@ CREATE TRIGGER ContactInserConstrain BEFORE INSERT On Contact
 			END IF;
 		END IF;
 	END;
+	//
 CREATE TRIGGER ContactUpdateConstrain BEFORE UPDATE On Contact
 	FOR EACH ROW
 	BEGIN
@@ -330,6 +334,7 @@ CREATE TRIGGER ContactUpdateConstrain BEFORE UPDATE On Contact
 			END IF;
 		END IF;
 	END;
+	//
 CREATE TRIGGER CategoryPriceInsertConstrain BEFORE INSERT On RoomCategoryPrice
 	FOR EACH ROW
 	BEGIN
@@ -349,6 +354,7 @@ CREATE TRIGGER CategoryPriceInsertConstrain BEFORE INSERT On RoomCategoryPrice
         SET MESSAGE_TEXT = 'ListPrice is under Minimum Price';
 		END IF;
 	END;
+	//
 CREATE TRIGGER CategoryPriceUpdateConstrain BEFORE UPDATE On RoomCategoryPrice
 	FOR EACH ROW
 	BEGIN
@@ -368,6 +374,7 @@ CREATE TRIGGER CategoryPriceUpdateConstrain BEFORE UPDATE On RoomCategoryPrice
         SET MESSAGE_TEXT = 'ListPrice is under Minimum Price';
 		END IF;
 	END;
+	//
 
-
+DELIMITER ;
 
