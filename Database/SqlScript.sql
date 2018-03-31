@@ -227,14 +227,14 @@ CREATE TABLE ReservationUnit(
 	ReservationUnitID INTEGER NOT NULL ,
 	Reservation INTEGER NOT NULL,
 	RoomCategory INTEGER NOT NULL,
-	Cancelation INTEGER,
+	Cancellation INTEGER,
 	Package INTEGER,
   StartDate DATE NOT NULL,
 	EndDate DATE NOT NULL,
   PRIMARY KEY (ReservationUnitID),
   FOREIGN KEY (Reservation) REFERENCES Reservation(ReservationID),
   FOREIGN KEY (RoomCategory) REFERENCES RoomCategory(RoomCategoryID),
-  FOREIGN KEY (Cancelation) REFERENCES Cancellation(CancellationID),
+  FOREIGN KEY (Cancellation) REFERENCES Cancellation(CancellationID),
   FOREIGN KEY (Package) REFERENCES Package(PackageID)
 );
 
@@ -377,4 +377,3 @@ CREATE TRIGGER CategoryPriceUpdateConstrain BEFORE UPDATE On RoomCategoryPrice
 	//
 
 DELIMITER ;
-
