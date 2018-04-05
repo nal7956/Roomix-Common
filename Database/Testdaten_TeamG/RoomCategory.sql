@@ -1,0 +1,10 @@
+insert into RoomCategory (RoomCategoryID, CategoryDescription) values (1, 'Einzelzimmer');
+insert into RoomCategory (RoomCategoryID, CategoryDescription) values (2, 'Einzelzimmer mit Waldblick');
+insert into RoomCategory (RoomCategoryID, CategoryDescription) values (3, 'Einzelzimmer mit Seeblick');
+insert into RoomCategory (RoomCategoryID, CategoryDescription) values (4, 'Einzelzimmer Spa - Bereich');
+insert into RoomCategory (RoomCategoryID, CategoryDescription) values (5, 'Doppelzimmer mit Waldblick');
+insert into RoomCategory (RoomCategoryID, CategoryDescription) values (6, 'Doppelzimmer mit Seeblick');
+insert into RoomCategory (RoomCategoryID, CategoryDescription) values (7, 'Doppelzimmer');
+insert into RoomCategory (RoomCategoryID, CategoryDescription) values (8, 'Doppelzimmer - Suit');
+insert into RoomCategory (RoomCategoryID, CategoryDescription) values (9, 'Dreibettzimmer');
+insert into RoomCategory (RoomCategoryID, CategoryDescription) values (10, 'Vierbettzimmer');
