@@ -129,11 +129,11 @@ CREATE TABLE Article(
 -- 	FOREIGN KEY (Article) REFERENCES Article(ArticleID)
 -- );
 
-CREATE TABLE Package(
-	PackageID INTEGER AUTO_INCREMENT,
+CREATE TABLE Arrangement(
+	ArrangementID INTEGER AUTO_INCREMENT,
 	Article INTEGER NOT NULL,
     Discount INTEGER DEFAULT 0,
-	PRIMARY KEY (PackageID),
+	PRIMARY KEY (ArrangementID),
 	FOREIGN KEY (Article) REFERENCES Article(ArticleID)
 );
 
@@ -275,7 +275,7 @@ CREATE TABLE InvoicePosition (
 	Invoice INTEGER,
 	RoomAssignment INTEGER,
 	Article INTEGER,
-  Package INTEGER,
+  Arrangement INTEGER,
   FreePosition VARCHAR(200),
 	Amount DECIMAL(5) NOT NULL ,
 	DeterminationDate TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -286,7 +286,7 @@ CREATE TABLE InvoicePosition (
 	FOREIGN KEY (Invoice) REFERENCES Invoice(InvoiceID),
   FOREIGN KEY (RoomAssignment) REFERENCES RoomAssignment(RoomAssignmentID),
   FOREIGN KEY (Article) REFERENCES Article(ArticleID),
-  FOREIGN KEY (Package) REFERENCES Package(PackageID)
+  FOREIGN KEY (Arrangement) REFERENCES Arrangement(ArrangementID)
 );
 
 -- Constrain Checks
