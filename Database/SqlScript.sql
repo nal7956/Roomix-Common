@@ -1,6 +1,7 @@
 DROP DATABASE IF EXISTS Roomix;
 
 CREATE DATABASE Roomix;
+
 USE Roomix;
 
 CREATE TABLE Season (
@@ -13,7 +14,7 @@ CREATE TABLE Season (
 );
 
 CREATE TABLE RoomCategory(
-	RoomCategoryID INTEGER NOT NULL,
+	RoomCategoryID INTEGER AUTO_INCREMENT,
 	CategoryDescription varchar(150) NOT NULL,
 	PRIMARY KEY (RoomCategoryID)
 );
@@ -34,11 +35,10 @@ CREATE TABLE Room(
 );
 
 CREATE TABLE RoomFacility(
-	RoomFacilityID INTEGER AUTO_INCREMENT,
 	Room INTEGER NOT NULL,
 	Facility INTEGER NOT NULL,
-	UNIQUE (Room, Facility),
-	PRIMARY KEY (RoomFacilityID),
+	Amount INTEGER NOT NULL,
+	PRIMARY KEY (Room, Facility),
 	FOREIGN KEY (Facility) REFERENCES Facility(FacilityID),
 	FOREIGN KEY (Room) REFERENCES Room(RoomID)
 );
@@ -58,16 +58,17 @@ CREATE TABLE RoomCategoryPrice(
 
 CREATE TABLE Contact(
 	ContactID INTEGER AUTO_INCREMENT,
-	Fname varchar(50),
-	Surname varchar(50),
+	FirstName varchar(50),
+	LastName varchar(50),
 	CompanyName VARCHAR(50),
-	PhoneNumber VARCHAR(50) NOT NULL ,
-	Street varchar(50)NOT NULL ,
-	Place varchar(50)NOT NULL ,
-	Postcode varchar(50)NOT NULL ,
-	Country varchar(30)NOT NULL ,
-	Email varchar(50)NOT NULL ,
-	Active BOOLEAN NOT NULL DEFAULT TRUE ,
+	PhoneNumber VARCHAR(50) NOT NULL,
+	Street varchar(50)NOT NULL,
+    HouseNumber varchar(50) NOT NULL,
+	Place varchar(50)NOT NULL,
+	Postcode varchar(50)NOT NULL,
+	Country varchar(30)NOT NULL,
+	Email varchar(50)NOT NULL,
+	Active BOOLEAN NOT NULL DEFAULT TRUE,
 	PRIMARY KEY (ContactID)
 );
 
@@ -81,9 +82,9 @@ CREATE TABLE ContactNote(
 
 CREATE TABLE CreditCard(
 	CreditCardID INTEGER AUTO_INCREMENT,
-	Number VARCHAR(50) NOT NULL ,
-	Owner varchar(50),
-	Type VARCHAR(10) NOT NULL,
+	CardNumber VARCHAR(50) NOT NULL,
+	CardOwner VARCHAR(50),
+	CardType VARCHAR(10) NOT NULL,
 	ValidDate DATE NOT NULL,
 	Contact INTEGER,
 	PRIMARY KEY (CreditCardID),
@@ -91,7 +92,7 @@ CREATE TABLE CreditCard(
 );
 
 CREATE TABLE Person (
-	PersonID INT AUTO_INCREMENT,
+	PersonID INTEGER AUTO_INCREMENT,
 	IsVIP BOOLEAN NOT NULL,
 	Archive BOOLEAN NOT NULL,
 	Contact INTEGER NOT NULL,
@@ -101,47 +102,48 @@ CREATE TABLE Person (
 
 CREATE TABLE ContractingParty(
 	ContractingPartyID INTEGER AUTO_INCREMENT,
-	ContractingPartyType varchar(50) NOT NULL ,
-	Contact INTEGER NOT NULL ,
+	ContractingPartyType varchar(50) NOT NULL,
+	Contact INTEGER NOT NULL,
 	PRIMARY KEY (ContractingPartyID),
 	FOREIGN KEY (Contact) REFERENCES Contact(ContactID)
 );
 
 CREATE TABLE CancellationCondition(
 	CancellationConditionID INTEGER AUTO_INCREMENT,
-	CancellationFee DECIMAL(5) NOT NULL ,
+	CancellationFee DECIMAL(5) NOT NULL,
 	DaysBeforeArrival INTEGER NOT NULL,
-  PRIMARY KEY (CancellationConditionID)
+	PRIMARY KEY (CancellationConditionID)
 );
 
 CREATE TABLE Article(
 	ArticleID INTEGER AUTO_INCREMENT,
 	ArticleDescription VARCHAR(50),
-  PRIMARY KEY (ArticleID)
+    Amount DECIMAL(5),
+	PRIMARY KEY (ArticleID)
 );
 
-CREATE TABLE HotelService(
-	HotelServiceID INTEGER AUTO_INCREMENT,
-	Article INTEGER NOT NULL ,
-  PRIMARY KEY (HotelServiceID),
-  FOREIGN KEY (Article) REFERENCES Article(ArticleID)
-);
+-- CREATE TABLE HotelService(
+-- 	HotelServiceID INTEGER AUTO_INCREMENT,
+-- 	Article INTEGER NOT NULL,
+-- 	PRIMARY KEY (HotelServiceID),
+-- 	FOREIGN KEY (Article) REFERENCES Article(ArticleID)
+-- );
 
 CREATE TABLE Arrangement(
-	ArrangementID INTEGER,
-	Article INTEGER NOT NULL ,
-  PRIMARY KEY (ArrangementID),
-  FOREIGN KEY (Article) REFERENCES Article(ArticleID)
+	ArrangementID INTEGER AUTO_INCREMENT,
+	Article INTEGER NOT NULL,
+    Discount INTEGER DEFAULT 0,
+	PRIMARY KEY (ArrangementID),
+	FOREIGN KEY (Article) REFERENCES Article(ArticleID)
 );
 
 CREATE TABLE Cancellation(
 	CancellationID INTEGER AUTO_INCREMENT,
-	CancellationCondition INTEGER NOT NULL ,
-	Date TIMESTAMP NOT NULL DEFAULT NOW(),
+	CancellationCondition INTEGER NOT NULL,
+	CancellationDate TIMESTAMP NOT NULL DEFAULT NOW(),
 	Description varchar(150),
 	PRIMARY KEY (CancellationID),
-  FOREIGN KEY (CancellationCondition)
-    REFERENCES CancellationCondition(CancellationConditionID)
+	FOREIGN KEY (CancellationCondition) REFERENCES CancellationCondition(CancellationConditionID)
 );
 
 CREATE TABLE PartnerAgreement(
@@ -150,96 +152,101 @@ CREATE TABLE PartnerAgreement(
 	CancellationCondition INTEGER NOT NULL,
 	StartDate DATE NOT NULL,
 	ExpiringDate DATE NOT NULL,
+    RoomCategory INTEGER,
+    CountRoomCategory INTEGER,
 	Discount INTEGER NOT NULL DEFAULT 0,
-  PRIMARY KEY (AgreementID),
-  FOREIGN KEY (ContractingParty)
-    REFERENCES ContractingParty(ContractingPartyID),
-  FOREIGN KEY (CancellationCondition)
-    REFERENCES CancellationCondition(CancellationConditionID)
+	PRIMARY KEY (AgreementID),
+	FOREIGN KEY (ContractingParty) REFERENCES ContractingParty(ContractingPartyID),
+	FOREIGN KEY (CancellationCondition) REFERENCES CancellationCondition(CancellationConditionID),
+    FOREIGN KEY (RoomCategory) REFERENCES RoomCategory(RoomCategoryID)
+);
+
+CREATE TABLE PaymentType(
+	PaymentTypeID INTEGER AUTO_INCREMENT,
+	PaymentTypeDescription VARCHAR(150),
+	PRIMARY KEY (PaymentTypeID)
 );
 
 CREATE TABLE Reservation(
 	ReservationID INTEGER AUTO_INCREMENT,
 	ContractingParty INTEGER NOT NULL,
-	Person INTEGER NOT NULL,
+	PaymentType INTEGER NOT NULL,
 	ReservationStatus VARCHAR(15) NOT NULL,
-  PRIMARY KEY (ReservationID),
-  FOREIGN KEY (ContractingParty) REFERENCES ContractingParty(ContractingPartyID),
-  FOREIGN KEY (Person) REFERENCES Person(PersonID)
+	ReservationComment VARCHAR(1024),
+	PRIMARY KEY (ReservationID),
+	FOREIGN KEY (ContractingParty) REFERENCES ContractingParty(ContractingPartyID),
+	FOREIGN KEY (PaymentType) REFERENCES PaymentType(PaymentTypeID)
 );
 
-CREATE TABLE ReservationOption(
-	OptionID INTEGER AUTO_INCREMENT,
-	Reservation INTEGER NOT NULL ,
-	OptionDueDate DATE NOT NULL,
-	OptionDescription varchar(150) NOT NULL,
-	OptionStatus BOOLEAN NOT NULL,
-  PRIMARY KEY (OptionID),
-  FOREIGN KEY (Reservation) REFERENCES Reservation(ReservationID)
+CREATE TABLE PersonReservation(
+	Reservation INTEGER NOT NULL,
+	Person INTEGER NOT NULL,
+	PRIMARY KEY (Reservation, Person),
+	FOREIGN KEY (Reservation) REFERENCES Reservation(ReservationID),
+	FOREIGN KEY (Person) REFERENCES Person(PersonID)
 );
 
 CREATE TABLE TourGroup (
     TourGroupID INTEGER AUTO_INCREMENT,
 	TourGroupName VARCHAR(50) NOT NULL,
 	TourGroupLeader INTEGER NOT NULL,
-  PRIMARY KEY (TourGroupID),
-  FOREIGN KEY (TourGroupLeader) REFERENCES Person(PersonID)
+	PRIMARY KEY (TourGroupID),
+	FOREIGN KEY (TourGroupLeader) REFERENCES Person(PersonID)
 );
 
 CREATE TABLE TourGroupMember (
-	TourGroupMemberID INTEGER AUTO_INCREMENT,
-	TourGroupID INTEGER,
+	TourGroupID INTEGER NOT NULL,
 	TourGroupMember INTEGER NOT NULL,
-  UNIQUE (TourGroupID, TourGroupMember),
-  PRIMARY KEY(TourGroupMemberID),
-  FOREIGN KEY (TourGroupID) REFERENCES TourGroup(TourGroupID),
-  FOREIGN KEY (TourGroupMember) REFERENCES Person(PersonID)
+	PRIMARY KEY (TourGroupID, TourGroupMember),
+	FOREIGN KEY (TourGroupID) REFERENCES TourGroup(TourGroupID),
+	FOREIGN KEY (TourGroupMember) REFERENCES Person(PersonID)
 );
 
-CREATE TABLE PaymentType(
-	PaymentTypeID INTEGER NOT NULL,
-	PaymentTypeDescription VARCHAR(150),
-  PRIMARY KEY (PaymentTypeID)
+CREATE TABLE ReservationOption(
+	OptionID INTEGER AUTO_INCREMENT,
+	OptionDueDate DATE NOT NULL,
+	OptionDescription varchar(150) NOT NULL,
+	OptionStatus BOOLEAN NOT NULL,
+	PRIMARY KEY (OptionID)
 );
 
 CREATE TABLE Invoice(
 	InvoiceID INTEGER AUTO_INCREMENT,
-	Name varchar(50) NOT NULL,
-	Street varchar(50)NOT NULL,
-	Place varchar(50)NOT NULL,
-	Postcode varchar(50)NOT NULL,
-	Country varchar(30)NOT NULL,
-	DateOfIssue TIMESTAMP NOT NULL DEFAULT NOW(),
-  Status VARCHAR(15) NOT NULL,
-  PRIMARY KEY (InvoiceID)
+	Contact INTEGER NOT NULL,
+	DeterminationDate TIMESTAMP NOT NULL DEFAULT NOW(),
+	Status VARCHAR(15) NOT NULL,
+	PRIMARY KEY (InvoiceID),
+	FOREIGN KEY (Contact) REFERENCES Contact(ContactID)
 );
 
 CREATE TABLE Payment(
-	PaymentID INTEGER NOT NULL,
+	PaymentID INTEGER AUTO_INCREMENT,
 	Invoice INTEGER NOT NULL,
-  PaymentType INTEGER NOT NULL,
+	PaymentType INTEGER NOT NULL,
 	Amount DECIMAL(5) NOT NULL,
-  DateOfIssue TIMESTAMP NOT NULL DEFAULT NOW(),
-  DueDate DATE NOT NULL,
-  PaidDate DATE,
-  PRIMARY KEY (PaymentID),
-  FOREIGN KEY (Invoice) REFERENCES Invoice(InvoiceID),
-  FOREIGN KEY (PaymentType) REFERENCES PaymentType(PaymentTypeID)
+	DeterminationDate TIMESTAMP NOT NULL DEFAULT NOW(),
+	DueDate DATE NOT NULL,
+	PaidDate DATE,
+	PRIMARY KEY (PaymentID),
+	FOREIGN KEY (Invoice) REFERENCES Invoice(InvoiceID),
+	FOREIGN KEY (PaymentType) REFERENCES PaymentType(PaymentTypeID)
 );
 
 CREATE TABLE ReservationUnit(
-	ReservationUnitID INTEGER NOT NULL ,
+	ReservationUnitID INTEGER AUTO_INCREMENT,
 	Reservation INTEGER NOT NULL,
 	RoomCategory INTEGER NOT NULL,
-	Cancelation INTEGER,
-	Arrangement INTEGER,
+  ReservationOption INTEGER,
+  AmountOfRooms INTEGER,
+	Cancellation INTEGER,
+	ArrivalTime TIME,
 	StartDate DATE NOT NULL,
 	EndDate DATE NOT NULL,
-  PRIMARY KEY (ReservationUnitID),
-  FOREIGN KEY (Reservation) REFERENCES Reservation(ReservationID),
-  FOREIGN KEY (RoomCategory) REFERENCES RoomCategory(RoomCategoryID),
-  FOREIGN KEY (Cancelation) REFERENCES Cancellation(CancellationID),
-  FOREIGN KEY (Arrangement) REFERENCES Arrangement(ArrangementID)
+	PRIMARY KEY (ReservationUnitID),
+	FOREIGN KEY (Reservation) REFERENCES Reservation(ReservationID),
+	FOREIGN KEY (RoomCategory) REFERENCES RoomCategory(RoomCategoryID),
+	FOREIGN KEY (Cancellation) REFERENCES Cancellation(CancellationID),
+  FOREIGN KEY (ReservationOption) REFERENCES ReservationOption(OptionID)
 );
 
 CREATE TABLE RoomAssignment(
@@ -248,19 +255,17 @@ CREATE TABLE RoomAssignment(
 	DepartureDate DATE NOT NULL,
 	Room INTEGER NOT NULL,
 	ReservationUnit INTEGER NOT NULL,
-  PRIMARY KEY (RoomAssignmentID),
-  FOREIGN KEY (Room) REFERENCES Room(RoomID),
-  FOREIGN KEY (ReservationUnit) REFERENCES ReservationUnit(ReservationUnitID)
+	PRIMARY KEY (RoomAssignmentID),
+	FOREIGN KEY (Room) REFERENCES Room(RoomID),
+	FOREIGN KEY (ReservationUnit) REFERENCES ReservationUnit(ReservationUnitID)
 );
 
 CREATE TABLE PersonRoomAssignment(
-	PersonRoomAssignmentID INTEGER AUTO_INCREMENT,
     RoomAssignment INTEGER NOT NULL,
 	Person INTEGER NOT NULL,
-  UNIQUE (RoomAssignment, Person),
-  PRIMARY KEY (PersonRoomAssignmentID),
-  FOREIGN KEY (RoomAssignment) REFERENCES RoomAssignment(RoomAssignmentID),
-  FOREIGN KEY (Person) REFERENCES Person(PersonID)
+	PRIMARY KEY (RoomAssignment, Person),
+	FOREIGN KEY (RoomAssignment) REFERENCES RoomAssignment(RoomAssignmentID),
+	FOREIGN KEY (Person) REFERENCES Person(PersonID)
 );
 
 CREATE TABLE InvoicePosition (
@@ -268,15 +273,20 @@ CREATE TABLE InvoicePosition (
 	Reservation INTEGER NOT NULL,
 	ReservationUnit INTEGER NOT NULL,
 	Invoice INTEGER,
-	RoomAssignment INTEGER, -- Only HotelService OR RoomAssignment
-	HotelService INTEGER,
+	RoomAssignment INTEGER,
+	Article INTEGER,
+  Arrangement INTEGER,
+  FreePosition VARCHAR(200),
 	Amount DECIMAL(5) NOT NULL ,
-	DateOfIssue TIMESTAMP NOT NULL DEFAULT NOW(),
+	DeterminationDate TIMESTAMP NOT NULL DEFAULT NOW(),
 	Count INTEGER NOT NULL DEFAULT 1,
 	PRIMARY KEY (InvoicePositionID),
 	FOREIGN KEY (Reservation) REFERENCES Reservation(ReservationID),
 	FOREIGN KEY (ReservationUnit) REFERENCES ReservationUnit(ReservationUnitID),
-	FOREIGN KEY (Invoice) REFERENCES Invoice(InvoiceID)
+	FOREIGN KEY (Invoice) REFERENCES Invoice(InvoiceID),
+  FOREIGN KEY (RoomAssignment) REFERENCES RoomAssignment(RoomAssignmentID),
+  FOREIGN KEY (Article) REFERENCES Article(ArticleID),
+  FOREIGN KEY (Arrangement) REFERENCES Arrangement(ArrangementID)
 );
 
 -- Constrain Checks
@@ -288,14 +298,6 @@ CREATE TRIGGER InvoicePositionInsertConstrain BEFORE INSERT On InvoicePosition
       SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Count must be bigger than zero';
     END IF;
-		IF (NEW.RoomAssignment IS NULL AND NEW.HotelService IS NULL) THEN
-      SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'You must specify the Invoice Position';
-    END IF;
-    IF (NEW.RoomAssignment IS NOT NULL AND NEW.HotelService IS NOT NULL) THEN
-      SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Multiple specifications in the Invoice Position';
-    END IF;
 	END;
 	//
 CREATE TRIGGER InvoicePositionUpdateConstrain BEFORE UPDATE On InvoicePosition
@@ -305,14 +307,7 @@ CREATE TRIGGER InvoicePositionUpdateConstrain BEFORE UPDATE On InvoicePosition
       SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Count must be bigger than zero';
     END IF;
-		IF (NEW.RoomAssignment IS NULL AND NEW.HotelService IS NULL) THEN
-      SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'You must specify the Invoice Position';
-    END IF;
-    IF (NEW.RoomAssignment IS NOT NULL AND NEW.HotelService IS NOT NULL) THEN
-      SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Multiple specifications in the Invoice Position';
-    END IF;
+
     IF (NEW.Invoice IS NOT NULL) THEN
 			SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Invoice already make. Changes are not Allowed';
@@ -323,7 +318,7 @@ CREATE TRIGGER ContactInserConstrain BEFORE INSERT On Contact
 	FOR EACH ROW
 	BEGIN
 		IF (NEW.CompanyName IS NULL) THEN
-			IF (NEW.Fname IS NULL OR New.Surname IS NULL ) THEN
+			IF (NEW.FirstName IS NULL OR New.LastName IS NULL ) THEN
 				SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'Cannot add or update row: Forname and Lname OR CompanyName is required';
 			END IF;
@@ -334,7 +329,7 @@ CREATE TRIGGER ContactUpdateConstrain BEFORE UPDATE On Contact
 	FOR EACH ROW
 	BEGIN
 		IF (NEW.CompanyName IS NULL) THEN
-			IF (NEW.Fname IS NULL OR New.Surname IS NULL ) THEN
+			IF (NEW.FirstName IS NULL OR New.LastName IS NULL ) THEN
 				SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'Cannot add or update row: Forname and Lname OR CompanyName is required';
 			END IF;
@@ -383,4 +378,3 @@ CREATE TRIGGER CategoryPriceUpdateConstrain BEFORE UPDATE On RoomCategoryPrice
 	//
 
 DELIMITER ;
-
