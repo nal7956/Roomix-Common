@@ -122,12 +122,12 @@ CREATE TABLE Article(
 	PRIMARY KEY (ArticleID)
 );
 
--- CREATE TABLE HotelService(
--- 	HotelServiceID INTEGER AUTO_INCREMENT,
--- 	Article INTEGER NOT NULL,
--- 	PRIMARY KEY (HotelServiceID),
--- 	FOREIGN KEY (Article) REFERENCES Article(ArticleID)
--- );
+CREATE TABLE HotelService(
+	HotelServiceID INTEGER AUTO_INCREMENT,
+	Article INTEGER NOT NULL,
+	PRIMARY KEY (HotelServiceID),
+	FOREIGN KEY (Article) REFERENCES Article(ArticleID)
+);
 
 CREATE TABLE Arrangement(
 	ArrangementID INTEGER AUTO_INCREMENT,
@@ -169,13 +169,15 @@ CREATE TABLE PaymentType(
 
 CREATE TABLE Reservation(
 	ReservationID INTEGER AUTO_INCREMENT,
+	ReservationOption INTEGER,
 	ContractingParty INTEGER NOT NULL,
 	PaymentType INTEGER NOT NULL,
 	ReservationStatus VARCHAR(15) NOT NULL,
 	ReservationComment VARCHAR(1024),
 	PRIMARY KEY (ReservationID),
 	FOREIGN KEY (ContractingParty) REFERENCES ContractingParty(ContractingPartyID),
-	FOREIGN KEY (PaymentType) REFERENCES PaymentType(PaymentTypeID)
+	FOREIGN KEY (PaymentType) REFERENCES PaymentType(PaymentTypeID),
+	FOREIGN KEY (ReservationOption) REFERENCES ReservationOption(OptionID)
 );
 
 CREATE TABLE PersonReservation(
@@ -236,8 +238,7 @@ CREATE TABLE ReservationUnit(
 	ReservationUnitID INTEGER AUTO_INCREMENT,
 	Reservation INTEGER NOT NULL,
 	RoomCategory INTEGER NOT NULL,
-  ReservationOption INTEGER,
-  AmountOfRooms INTEGER,
+  	AmountOfRooms INTEGER,
 	Cancellation INTEGER,
 	ArrivalTime TIME,
 	StartDate DATE NOT NULL,
@@ -245,8 +246,7 @@ CREATE TABLE ReservationUnit(
 	PRIMARY KEY (ReservationUnitID),
 	FOREIGN KEY (Reservation) REFERENCES Reservation(ReservationID),
 	FOREIGN KEY (RoomCategory) REFERENCES RoomCategory(RoomCategoryID),
-	FOREIGN KEY (Cancellation) REFERENCES Cancellation(CancellationID),
-  FOREIGN KEY (ReservationOption) REFERENCES ReservationOption(OptionID)
+	FOREIGN KEY (Cancellation) REFERENCES Cancellation(CancellationID)
 );
 
 CREATE TABLE RoomAssignment(
